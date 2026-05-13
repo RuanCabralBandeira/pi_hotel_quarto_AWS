@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -23,14 +22,14 @@ model Quarto {
   numero       String?    @map("quarto_numero") @db.VarChar(45)
   status       Int        @map("quarto_status")
   tipoQuartoId Int        @map("tipo_quarto_id")
-  fotos        fotos[]
+  fotos        Foto[]
   tipoQuarto   TipoQuarto @relation(fields: [tipoQuartoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_quarto_tipo_quarto1")
 
   @@index([tipoQuartoId], map: "fk_quarto_tipo_quarto1_idx")
   @@map("quarto")
 }
 
-model fotos {
+model Foto {
   foto_id       Int     @id
   foto_bin      Bytes?  @db.Blob
   foto_nome     String? @db.VarChar(45)
@@ -40,4 +39,5 @@ model fotos {
   quarto        Quarto  @relation(fields: [quarto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_fotos_quarto1")
 
   @@index([quarto_id], map: "fk_fotos_quarto1_idx")
+  @@map("fotos")
 }

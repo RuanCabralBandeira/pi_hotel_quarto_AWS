@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+
+  hotel-quarto:
+
+    build: .
+
+    container_name: hotel-quarto
+
+    ports:
+      - "9533:9533"
+
+    volumes:
+      - .:/app
+
+    restart: always

@@ -8,7 +8,7 @@ pipeline {
 
             steps {
 
-                bat 'npm install'
+                sh 'npm install'
             }
         }
 
@@ -16,7 +16,7 @@ pipeline {
 
             steps {
 
-                bat 'npx prisma generate'
+                sh 'npx prisma generate'
             }
         }
 
@@ -24,8 +24,8 @@ pipeline {
 
             steps {
 
-                bat 'node -v'
-                bat 'npm -v'
+                sh 'node -v'
+                sh 'npm -v'
             }
         }
     }

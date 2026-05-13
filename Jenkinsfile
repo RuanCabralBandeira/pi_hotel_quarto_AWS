@@ -8,7 +8,7 @@ pipeline {
 
             steps {
 
-                bat 'npm install'
+                sh 'npm install'
             }
         }
 
@@ -16,7 +16,7 @@ pipeline {
 
             steps {
 
-                bat 'npx prisma generate'
+                sh 'npx prisma generate'
             }
         }
 
@@ -24,7 +24,7 @@ pipeline {
 
             steps {
 
-                bat 'docker compose build'
+                sh 'docker compose build'
             }
         }
 
@@ -32,7 +32,7 @@ pipeline {
 
             steps {
 
-                bat 'docker compose up -d'
+                sh 'docker compose up -d'
             }
         }
 
@@ -40,7 +40,8 @@ pipeline {
 
             steps {
 
-                bat 'docker ps'
+                sh 'node -v'
+                sh 'npm -v'
             }
         }
     }

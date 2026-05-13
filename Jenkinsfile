@@ -20,12 +20,27 @@ pipeline {
             }
         }
 
-        stage('Start Application') {
+        stage('Docker Build') {
 
             steps {
 
-                bat 'node -v'
-                bat 'npm -v'
+                bat 'docker compose build'
+            }
+        }
+
+        stage('Docker Up') {
+
+            steps {
+
+                bat 'docker compose up -d'
+            }
+        }
+
+        stage('Docker PS') {
+
+            steps {
+
+                bat 'docker ps'
             }
         }
     }
@@ -42,3 +57,4 @@ pipeline {
             echo 'Erro na pipeline!'
         }
     }
+}

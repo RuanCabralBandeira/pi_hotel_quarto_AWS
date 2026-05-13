@@ -4,32 +4,42 @@ pipeline {
 
     stages {
 
-        stage('Install') {
+        stage('Install Dependencies') {
 
             steps {
-                sh 'npm install'
+
+                bat 'npm install'
             }
         }
 
         stage('Prisma Generate') {
 
             steps {
-                sh 'npx prisma generate'
+
+                bat 'npx prisma generate'
             }
         }
 
-        stage('Docker Build') {
+        stage('Start Application') {
 
             steps {
-                sh 'docker compose build'
+
+                bat 'node -v'
+                bat 'npm -v'
             }
         }
+    }
 
-        stage('Docker Up') {
+    post {
 
-            steps {
-                sh 'docker compose up -d'
-            }
+        success {
+
+            echo 'Pipeline executada com sucesso!'
+        }
+
+        failure {
+
+            echo 'Erro na pipeline!'
         }
     }
 }

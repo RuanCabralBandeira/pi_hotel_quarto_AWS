@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
 
   hotel-quarto:
@@ -11,7 +9,7 @@ services:
     ports:
       - "9533:9533"
 
-    volumes:
-      - .:/app
+    env_file:
+      - .env
 
     restart: always

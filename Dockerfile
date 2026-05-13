@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:20 AS builder
 
 WORKDIR /app
 
@@ -8,6 +8,22 @@ RUN npm install
 
 COPY . .
 
+RUN npx prisma generate
+
+FROM node:20
+
+WORKDIR /app
+
+COPY --from=builder /app/node_modules ./node_modules
+
+COPY --from=builder /app/src ./src
+
+COPY --from=builder /app/prisma ./prisma
+
+COPY --from=builder /app/package.json ./package.json
+
+COPY --from=builder /app/.env ./.env
+
 EXPOSE 9533
 
-CMD ["npm", "run", "dev"]
+CMD ["node", "src/server.js"]

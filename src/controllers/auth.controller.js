@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-exports.login = async (req, res, next) => {
+exports.login = async (req, res) => {
 
     const token = jwt.sign(
         { user: 'admin' },
@@ -9,6 +9,4 @@ exports.login = async (req, res, next) => {
     );
 
     res.send({ token });
-
-    next();
 };

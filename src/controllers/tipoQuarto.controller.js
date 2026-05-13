@@ -1,15 +1,13 @@
 const prisma = require('../config/prisma');
 
-exports.getAll = async (req, res, next) => {
+exports.getAll = async (req, res) => {
 
     const tipos = await prisma.tipoQuarto.findMany();
 
     res.send(tipos);
-
-    next();
 };
 
-exports.getById = async (req, res, next) => {
+exports.getById = async (req, res) => {
 
     const tipo = await prisma.tipoQuarto.findUnique({
 
@@ -19,22 +17,19 @@ exports.getById = async (req, res, next) => {
     });
 
     res.send(tipo);
-
-    next();
 };
 
-exports.create = async (req, res, next) => {
+exports.create = async (req, res) => {
 
     const tipo = await prisma.tipoQuarto.create({
+
         data: req.body
     });
 
     res.send(tipo);
-
-    next();
 };
 
-exports.update = async (req, res, next) => {
+exports.update = async (req, res) => {
 
     const tipo = await prisma.tipoQuarto.update({
 
@@ -46,13 +41,23 @@ exports.update = async (req, res, next) => {
     });
 
     res.send(tipo);
-
-    next();
 };
 
-exports.patch = exports.update;
+exports.patch = async (req, res) => {
 
-exports.remove = async (req, res, next) => {
+    const tipo = await prisma.tipoQuarto.update({
+
+        where: {
+            id: Number(req.params.id)
+        },
+
+        data: req.body
+    });
+
+    res.send(tipo);
+};
+
+exports.remove = async (req, res) => {
 
     await prisma.tipoQuarto.delete({
 
@@ -61,7 +66,7 @@ exports.remove = async (req, res, next) => {
         }
     });
 
-    res.send({ message: 'Tipo deletado' });
-
-    next();
+    res.send({
+        message: 'Tipo deletado'
+    });
 };

@@ -1,11 +1,12 @@
 const controller = require('../controllers/foto.controller');
+
 const auth = require('../middlewares/auth');
 
 module.exports = (server) => {
 
-    server.get('/api/quartos/:quartoId/fotos', controller.getByQuarto);
+    server.get('/api/quartos/:quartoId/fotos', auth, controller.getByQuarto);
 
-    server.get('/api/fotos/:fotoId', controller.getById);
+    server.get('/api/fotos/:fotoId', auth, controller.getById);
 
     server.post('/api/quartos/:quartoId/fotos', auth, controller.create);
 

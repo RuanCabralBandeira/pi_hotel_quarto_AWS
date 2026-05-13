@@ -2,10 +2,6 @@ require('dotenv').config();
 
 const restify = require('restify');
 
-const { connectRabbitMQ } = require('./config/rabbitmq');
-
-const consumirMensagens = require('./consumers/reserva.consumer');
-
 const server = restify.createServer();
 
 server.use(restify.plugins.bodyParser());
@@ -15,16 +11,7 @@ require('./routes/quarto.routes')(server);
 require('./routes/tipoQuarto.routes')(server);
 require('./routes/foto.routes')(server);
 
-async function startServer() {
+server.listen(process.env.PORT, () => {
 
-    await connectRabbitMQ();
-
-    await consumirMensagens();
-
-    server.listen(process.env.PORT, () => {
-
-        console.log(`Servidor rodando na porta ${process.env.PORT}`);
-    });
-}
-
-startServer();
+    console.log(`Servidor rodando na porta ${process.env.PORT}`);
+});

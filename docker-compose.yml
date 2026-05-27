@@ -28,9 +28,6 @@ services:
       PORT: ${PORT}
       RABBITMQ_URL: ${RABBITMQ_URL}
 
-    depends_on:
-      - rabbitmq-hotel-quarto
-
     command: >
       sh -c "
       npx prisma db push &&

@@ -1,18 +1,5 @@
 services:
-
-  rabbitmq-hotel-quarto:
-    image: rabbitmq:3-management
-
-    container_name: rabbitmq-hotel-quarto
-
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-
-    restart: always
-
   hotel-quarto:
-
     build: .
 
     container_name: hotel-quarto

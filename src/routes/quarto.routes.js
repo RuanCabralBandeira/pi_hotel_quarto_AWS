@@ -1,20 +1,19 @@
 const controller = require('../controllers/quarto.controller');
 
-const auth = require('../middlewares/auth');
 
 module.exports = (server) => {
 
-    server.get('/api/quartos', auth, controller.getAll);
+    server.get('/api/quartos', controller.getAll);
 
-    server.get('/api/quartos/preco', auth, controller.getByPreco);
+    server.get('/api/quartos/preco', controller.getByPreco);
 
-    server.get('/api/quartos/:id', auth, controller.getById);
+    server.get('/api/quartos/:id',controller.getById);
 
-    server.post('/api/quartos', auth, controller.create);
+    server.post('/api/quartos', controller.create);
 
-    server.put('/api/quartos/:id', auth, controller.update);
+    server.put('/api/quartos/:id',  controller.update);
 
-    server.patch('/api/quartos/:id', auth, controller.patch);
+    server.patch('/api/quartos/:id',  controller.patch);
 
-    server.del('/api/quartos/:id', auth, controller.remove);
+    server.del('/api/quartos/:id',  controller.remove);
 };

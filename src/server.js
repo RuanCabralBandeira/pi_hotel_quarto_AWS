@@ -15,7 +15,6 @@ async function startServer() {
         console.log("📦 [RabbitMQ] Conexão estabelecida com sucesso!");
 
         // 2. Só depois de conectado, carrega as rotas
-        require('./routes/auth.routes')(server);
         require('./routes/quarto.routes')(server);
         require('./routes/tipoQuarto.routes')(server);
         require('./routes/foto.routes')(server);

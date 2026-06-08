@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const { enviarMensagem } = require('../producers/quarto.producer');
 
 exports.getAll = async (req, res) => {
 
@@ -85,6 +86,14 @@ exports.create = async (req, res) => {
         data: req.body
     });
 
+    await enviarMensagem({
+        evento: 'QUARTO_CRIADO',
+        id: quarto.id,
+        numero: quarto.numero,
+        status: quarto.status,
+        tipoQuartoId: quarto.tipoQuartoId
+    });
+
     res.send(quarto);
 };
 
@@ -99,6 +108,14 @@ exports.update = async (req, res) => {
         },
 
         data: req.body
+    });
+
+    await enviarMensagem({
+        evento: 'QUARTO_ATUALIZADO',
+        id: quarto.id,
+        numero: quarto.numero,
+        status: quarto.status,
+        tipoQuartoId: quarto.tipoQuartoId
     });
 
     res.send(quarto);
@@ -117,6 +134,14 @@ exports.patch = async (req, res) => {
         data: req.body
     });
 
+    await enviarMensagem({
+        evento: 'QUARTO_PATCH',
+        id: quarto.id,
+        numero: quarto.numero,
+        status: quarto.status,
+        tipoQuartoId: quarto.tipoQuartoId
+    });
+
     res.send(quarto);
 };
 
@@ -129,6 +154,11 @@ exports.remove = async (req, res) => {
         where: {
             id: Number(id)
         }
+    });
+
+    await enviarMensagem({
+        evento: 'QUARTO_REMOVIDO',
+        id: Number(id)
     });
 
     res.send({

@@ -1,6 +1,17 @@
 const prisma = require('../config/prisma');
 const { enviarMensagem } = require('../producers/quarto.producer');
 
+exports.getAll = async (req, res) => {
+
+    const quartos = await prisma.quarto.findMany({
+        include: {
+            tipoQuarto: true,
+            fotos: true
+        }
+    });
+
+    res.send(quartos);
+};
 
 exports.getById = async (req, res) => {
 

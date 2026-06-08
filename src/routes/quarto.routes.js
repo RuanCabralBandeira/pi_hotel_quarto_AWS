@@ -7,8 +7,8 @@ module.exports = (server) => {
 
     server.get('/api/quartos/preco', controller.getByPreco);
 
-    server.get('/api/quartos/:id',controller.getById);
-
+    server.get('/api/quartos/:id', controller.getById);
+    
     server.post('/api/quartos', controller.create);
 
     server.put('/api/quartos/:id',  controller.update);

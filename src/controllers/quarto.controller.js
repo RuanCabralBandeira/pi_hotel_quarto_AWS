@@ -1,35 +1,22 @@
 const prisma = require('../config/prisma');
 const { enviarMensagem } = require('../producers/quarto.producer');
 
-exports.getAll = async (req, res) => {
 
-    const {
-        tipoQuartoId,
-        status,
-        skip,
-        take
-    } = req.query;
+exports.getById = async (req, res) => {
 
-    const quartos = await prisma.quarto.findMany({
+    const { id } = req.params;
+
+    if (!id) {
+        return res.send(400, {
+            error: 'ID não informado'
+        });
+    }
+
+    const quarto = await prisma.quarto.findUnique({
 
         where: {
-
-            tipoQuartoId: tipoQuartoId
-                ? Number(tipoQuartoId)
-                : undefined,
-
-            status: status
-                ? Number(status)
-                : undefined
+            id: Number(id)
         },
-
-        skip: skip
-            ? Number(skip)
-            : 0,
-
-        take: take
-            ? Number(take)
-            : 10,
 
         include: {
             tipoQuarto: true,
@@ -37,12 +24,20 @@ exports.getAll = async (req, res) => {
         }
     });
 
-    res.send(quartos);
+    if (!quarto) {
+        return res.send(404, {
+            error: 'Quarto não encontrado'
+        });
+    }
+
+    res.send(quarto);
 };
 
 exports.getById = async (req, res) => {
 
     const { id } = req.params;
+
+    console.log('ID:', id);
 
     const quarto = await prisma.quarto.findUnique({
 

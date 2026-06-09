@@ -1,9 +1,18 @@
 require('dotenv').config();
 const restify = require('restify');
 const { connectRabbitMQ } = require("./config/rabbitmq");
+const corsMiddleware = require("restify-cors-middleware2");
+
+const cors = corsMiddleware({
+  origins: ['*'],           // em produção pode restringir para o domínio do frontend
+  allowHeaders: ['Authorization', 'Content-Type'],
+  exposeHeaders: ['Authorization'],
+});
 
 const server = restify.createServer({ name: "api-hotel-quarto" });
 
+server.pre(cors.preflight);
+server.use(cors.actual);
 server.use(restify.plugins.queryParser()); 
 server.use(restify.plugins.bodyParser());
 

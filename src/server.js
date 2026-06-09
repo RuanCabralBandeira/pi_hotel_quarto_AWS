@@ -20,7 +20,7 @@ async function startServer() {
         require('./routes/foto.routes')(server);
 
         // 3. Por fim, inicia o servidor
-        const PORT = process.env.PORT || 9532;
+        const PORT = process.env.PORT || 9533;
         server.listen(PORT, () => {
             console.log(`${server.name} rodando na porta ${PORT} | Aguardando chamadas do API Gateway`);
         });

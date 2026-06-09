@@ -16,4 +16,6 @@ module.exports = (server) => {
     server.patch('/api/quartos/:id',  controller.patch);
 
     server.del('/api/quartos/:id',  controller.remove);
+
+    server.get('/api/quartos/reservas', controller.buscarReservas);
 };

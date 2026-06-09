@@ -1,5 +1,7 @@
 const prisma = require('../config/prisma');
 const { enviarMensagem } = require('../producers/quarto.producer');
+const axios = require('axios');
+
 
 exports.getAll = async (req, res) => {
 
@@ -210,4 +212,21 @@ exports.remove = async (req, res) => {
     });
 
 
+};
+
+exports.buscarReservas = async (req, res) => {
+    try {
+        const resposta = await axios.get(
+            process.env.URL_SERVICO_RESERVA
+        );
+
+        return res.send(200, resposta.data);
+
+    } catch (error) {
+        console.error(error);
+
+        return res.send(500, {
+            erro: error.message
+        });
+    }
 };

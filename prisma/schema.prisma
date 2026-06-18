@@ -30,8 +30,8 @@ model Quarto {
 }
 
 model Foto {
-  foto_id       Int     @id
-  foto_bin      Bytes?  @db.Blob
+  foto_id       Int     @id @default(autoincrement())
+  foto_bin      String? @db.MediumText
   foto_nome     String? @db.VarChar(45)
   foto_extensao String? @db.VarChar(45)
   foto_status   Int?

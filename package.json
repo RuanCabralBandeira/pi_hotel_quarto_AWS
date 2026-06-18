@@ -13,6 +13,7 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.2.0",
     "mysql2": "^3.11.3",
     "prisma": "^5.22.0",
     "restify": "^11.1.0",

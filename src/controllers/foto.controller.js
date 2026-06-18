@@ -2,85 +2,162 @@ const prisma = require('../config/prisma');
 
 exports.getByQuarto = async (req, res) => {
 
-    const fotos = await prisma.foto.findMany({
+    try {
 
-        where: {
-            quarto_id: Number(req.params.quartoId)
-        }
-    });
+        const quartoId = Number(req.params.quartoId);
 
-    res.send(fotos);
+        console.log('GET FOTOS - quartoId:', quartoId);
+
+        const fotos = await prisma.foto.findMany({
+            where: {
+                quarto_id: quartoId
+            }
+        });
+
+        res.send(fotos);
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        res.send(500, {
+            error: erro.message
+        });
+    }
 };
 
 exports.getById = async (req, res) => {
 
-    const foto = await prisma.foto.findUnique({
+    try {
 
-        where: {
-            foto_id: Number(req.params.fotoId)
-        }
-    });
+        const foto = await prisma.foto.findUnique({
+            where: {
+                foto_id: Number(req.params.fotoId)
+            }
+        });
 
-    res.send(foto);
+        res.send(foto);
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        res.send(500, {
+            error: erro.message
+        });
+    }
 };
 
 exports.create = async (req, res) => {
 
-    const foto = await prisma.foto.create({
+    try {
 
-        data: {
+        const quartoId = Number(req.params.quartoId);
 
-            foto_nome: req.body.foto_nome,
-
-            foto_extensao: req.body.foto_extensao,
-
-            foto_status: req.body.foto_status || 1,
-
-            quarto_id: Number(req.params.quartoId)
+        if (!quartoId) {
+            return res.send(400, {
+                error: 'quartoId não informado'
+            });
         }
-    });
 
-    res.send(foto);
+        const foto = await prisma.foto.create({
+            
+            data: {
+                        foto_bin: req.body.foto_bin,
+
+                        foto_nome: req.body.foto_nome,
+
+                        foto_extensao: req.body.foto_extensao,
+
+                        foto_status: Number(req.body.foto_status || 1),
+                        
+                        quarto_id: quartoId
+                    }
+        });
+
+        res.send(foto);
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        res.send(500, {
+            error: erro.message
+        });
+    }
 };
 
 exports.update = async (req, res) => {
 
-    const foto = await prisma.foto.update({
+    try {
 
-        where: {
-            foto_id: Number(req.params.fotoId)
-        },
+        const foto = await prisma.foto.update({
 
-        data: req.body
-    });
+            where: {
+                foto_id: Number(req.params.fotoId)
+            },
 
-    res.send(foto);
+            data: req.body
+        });
+
+        res.send(foto);
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        res.send(500, {
+            error: erro.message
+        });
+    }
 };
 
 exports.patch = async (req, res) => {
 
-    const foto = await prisma.foto.update({
+    try {
 
-        where: {
-            foto_id: Number(req.params.fotoId)
-        },
+        const foto = await prisma.foto.update({
 
-        data: req.body
-    });
+            where: {
+                foto_id: Number(req.params.fotoId)
+            },
 
-    res.send(foto);
+            data: req.body
+        });
+
+        res.send(foto);
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        res.send(500, {
+            error: erro.message
+        });
+    }
 };
 
 exports.remove = async (req, res) => {
 
-    await prisma.foto.delete({
+    try {
 
-        where: {
-            foto_id: Number(req.params.fotoId)
-        }
-    });
+        await prisma.foto.delete({
 
-    res.send({
-        message: 'Foto deletada'
-    });
+            where: {
+                foto_id: Number(req.params.fotoId)
+            }
+        });
+
+        res.send({
+            message: 'Foto deletada'
+        });
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        res.send(500, {
+            error: erro.message
+        });
+    }
 };

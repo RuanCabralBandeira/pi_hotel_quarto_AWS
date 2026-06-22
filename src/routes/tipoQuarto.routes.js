@@ -1,16 +1,19 @@
 const controller = require('../controllers/tipoQuarto.controller');
+const { auth, requireAdmin } = require('../middlewares/auth');
 
 module.exports = (server) => {
 
-    server.get('/api/tipos-quarto',  controller.getAll);
+    // Leitura: pública
+    server.get('/api/tipos-quarto', controller.getAll);
 
     server.get('/api/tipos-quarto/:id', controller.getById);
 
-    server.post('/api/tipos-quarto',  controller.create);
+    // Escrita: somente Admin autenticado
+    server.post('/api/tipos-quarto', auth, requireAdmin, controller.create);
 
-    server.put('/api/tipos-quarto/:id',  controller.update);
+    server.put('/api/tipos-quarto/:id', auth, requireAdmin, controller.update);
 
-    server.patch('/api/tipos-quarto/:id',  controller.patch);
+    server.patch('/api/tipos-quarto/:id', auth, requireAdmin, controller.patch);
 
-    server.del('/api/tipos-quarto/:id',  controller.remove);
+    server.del('/api/tipos-quarto/:id', auth, requireAdmin, controller.remove);
 };

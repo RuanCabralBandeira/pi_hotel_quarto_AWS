@@ -24,9 +24,13 @@
 const BASE = (process.env.QUARTO_API || 'http://localhost:9533').replace(/\/$/, '');
 const CONFIRMA = process.env.CONFIRMA === 'SIM';
 const INCLUIR_TIPOS = process.env.INCLUIR_TIPOS === '1';
+// Após habilitar o auth, apagar quarto exige token de Admin. Passe via TOKEN=...
+const TOKEN = process.env.TOKEN || '';
 
-async function fetchJson(url, options) {
-  const res = await fetch(url, options);
+async function fetchJson(url, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  if (TOKEN) headers.Authorization = `Bearer ${TOKEN}`;
+  const res = await fetch(url, { ...options, headers });
   const txt = await res.text();
   let data;
   try { data = txt ? JSON.parse(txt) : null; } catch { data = txt; }

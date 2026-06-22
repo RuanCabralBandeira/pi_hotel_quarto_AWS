@@ -1,65 +1,62 @@
 /**
- * Seed de quartos — popula tipos de quarto, ~48 quartos e fotos via API.
+ * Seed de quartos — popula tipos de quarto, 48 quartos e fotos via API.
  *
  * Usa só o fetch nativo do Node 20 (sem dependências). É idempotente:
  * - tipos: cria só os que faltam (compara por descrição)
  * - quartos: pula os números que já existem
+ * - cada quarto recebe sua própria foto (linha em `fotos` ligada pelo quarto_id)
  *
  * Como rodar:
- *   # contra um MS Quarto local (porta 9533)
  *   node scripts/seed-quartos.js
- *
- *   # contra o gateway da faculdade (CUIDADO: escreve no banco de produção)
  *   QUARTO_API="http://academico3.rj.senac.br/20261prj5/hotel/quarto" node scripts/seed-quartos.js
- *
- *   # sem baixar fotos (mais rápido / sem internet)
  *   SEM_FOTOS=1 node scripts/seed-quartos.js
  */
 
 const BASE = (process.env.QUARTO_API || 'http://localhost:9533').replace(/\/$/, '');
 const SEM_FOTOS = process.env.SEM_FOTOS === '1';
+// Após habilitar o auth, escrever quarto exige token de Admin. Passe via TOKEN=...
+const TOKEN = process.env.TOKEN || '';
 
-// Tipos de quarto desejados (descricao -> preço base por noite)
+// Tipos de quarto: descrição, preço base e quantos quartos desse tipo (soma = 48)
 const TIPOS = [
-  { descricao: 'Standard',   preco: 250 },
-  { descricao: 'Luxo',       preco: 480 },
-  { descricao: 'Suíte',      preco: 720 },
-  { descricao: 'Executivo',  preco: 600 },
-  { descricao: 'Família',    preco: 550 },
-  { descricao: 'Cobertura',  preco: 1200 },
+  { descricao: 'Standard',     preco: 250,  qtd: 10, foto: '1505693416388-ac5ce068fe85' },
+  { descricao: 'Casal',        preco: 300,  qtd: 6,  foto: '1522771739844-6a9f6d5f14af' },
+  { descricao: 'Solteiro',     preco: 220,  qtd: 5,  foto: '1598928506311-c55ded91a20c' },
+  { descricao: 'Luxo',         preco: 480,  qtd: 6,  foto: '1631049307264-da0ec9d70304' },
+  { descricao: 'Suíte',        preco: 720,  qtd: 5,  foto: '1582719478250-c89cae4dc85b' },
+  { descricao: 'Suíte Master', preco: 950,  qtd: 3,  foto: '1611892440504-42a792e24d32' },
+  { descricao: 'Executivo',    preco: 600,  qtd: 4,  foto: '1566073771259-6a8506099945' },
+  { descricao: 'Família',      preco: 550,  qtd: 4,  foto: '1590490360182-c33d57733427' },
+  { descricao: 'Premium',      preco: 800,  qtd: 3,  foto: '1618773928121-c32242e63f39' },
+  { descricao: 'Cobertura',    preco: 1500, qtd: 2,  foto: '1578683010236-d716f9a3f461' },
 ];
 
-// Uma foto (Unsplash) por tipo — baixada e convertida em base64 na hora
-const FOTO_POR_TIPO = {
-  'Standard':  'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=900&q=80',
-  'Luxo':      'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=900&q=80',
-  'Suíte':     'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=900&q=80',
-  'Executivo': 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80',
-  'Família':   'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=900&q=80',
-  'Cobertura': 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=900&q=80',
-};
+const fotoUrl = (id) => `https://images.unsplash.com/photo-${id}?w=600&q=70`;
 
-// Distribuição dos 48 quartos: 4 andares x 12 quartos. Tipo por posição no andar.
-// posições 1-5 Standard, 6-8 Luxo, 9-10 Executivo, 11 Família, 12 Suíte; andar 4 troca Suíte->Cobertura
+// Distribui os 48 quartos em números 101..112, 201..212, ... e intercala os tipos
+// (round-robin) para cada andar ter variedade de categorias.
 function montarQuartos() {
-  const lista = [];
-  for (let andar = 1; andar <= 4; andar++) {
-    for (let pos = 1; pos <= 12; pos++) {
-      const numero = String(andar * 100 + pos); // 101..112, 201..212, ...
-      let tipo;
-      if (pos <= 5) tipo = 'Standard';
-      else if (pos <= 8) tipo = 'Luxo';
-      else if (pos <= 10) tipo = 'Executivo';
-      else if (pos === 11) tipo = 'Família';
-      else tipo = andar === 4 ? 'Cobertura' : 'Suíte';
-      lista.push({ numero, tipo });
-    }
+  const fila = TIPOS.map((t) => ({ descricao: t.descricao, restante: t.qtd }));
+  const ordem = [];
+  let total = TIPOS.reduce((a, t) => a + t.qtd, 0);
+  let i = 0;
+  while (ordem.length < total) {
+    const t = fila[i % fila.length];
+    if (t.restante > 0) { ordem.push(t.descricao); t.restante--; }
+    i++;
   }
-  return lista;
+  // gera números por andar
+  const numeros = [];
+  for (let andar = 1; andar <= 4; andar++) {
+    for (let pos = 1; pos <= 12; pos++) numeros.push(String(andar * 100 + pos));
+  }
+  return ordem.map((tipo, idx) => ({ tipo, numero: numeros[idx] }));
 }
 
-async function fetchJson(url, options) {
-  const res = await fetch(url, options);
+async function fetchJson(url, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  if (TOKEN) headers.Authorization = `Bearer ${TOKEN}`;
+  const res = await fetch(url, { ...options, headers });
   const txt = await res.text();
   let data;
   try { data = txt ? JSON.parse(txt) : null; } catch { data = txt; }
@@ -70,8 +67,7 @@ async function fetchJson(url, options) {
 async function baixarBase64(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status} ao baixar imagem`);
-  const buf = Buffer.from(await res.arrayBuffer());
-  return buf.toString('base64');
+  return Buffer.from(await res.arrayBuffer()).toString('base64');
 }
 
 async function main() {
@@ -86,13 +82,9 @@ async function main() {
   }
   for (const t of TIPOS) {
     const chave = t.descricao.toLowerCase();
-    if (mapaTipos[chave]) {
-      console.log(`• tipo "${t.descricao}" já existe (id ${mapaTipos[chave]})`);
-      continue;
-    }
+    if (mapaTipos[chave]) { console.log(`• tipo "${t.descricao}" já existe (id ${mapaTipos[chave]})`); continue; }
     const criado = await fetchJson(`${BASE}/api/tipos-quarto`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ descricao: t.descricao, status: 1 }),
     });
     const id = criado.id ?? criado.tipo_quarto_id;
@@ -100,43 +92,32 @@ async function main() {
     console.log(`✓ tipo "${t.descricao}" criado (id ${id})`);
   }
 
-  // 2. Fotos base64 por tipo (uma vez cada)
+  // 2. Fotos base64 por tipo (baixa uma vez cada)
   const fotoBase64 = {};
   if (!SEM_FOTOS) {
     for (const t of TIPOS) {
-      const url = FOTO_POR_TIPO[t.descricao];
-      if (!url) continue;
-      try {
-        fotoBase64[t.descricao] = await baixarBase64(url);
-        console.log(`✓ foto baixada para "${t.descricao}"`);
-      } catch (e) {
-        console.log(`⚠ falha ao baixar foto de "${t.descricao}": ${e.message}`);
-      }
+      try { fotoBase64[t.descricao] = await baixarBase64(fotoUrl(t.foto)); console.log(`✓ foto baixada: ${t.descricao}`); }
+      catch (e) { console.log(`⚠ falha foto "${t.descricao}": ${e.message}`); }
     }
   }
 
   // 3. Quartos (pula números já existentes)
   const quartosExistentes = await fetchJson(`${BASE}/api/quartos`).catch(() => []);
-  const numerosExistentes = new Set(
-    (Array.isArray(quartosExistentes) ? quartosExistentes : []).map((q) => String(q.numero))
-  );
-
+  const numerosExistentes = new Set((Array.isArray(quartosExistentes) ? quartosExistentes : []).map((q) => String(q.numero)));
   const precoPorTipo = Object.fromEntries(TIPOS.map((t) => [t.descricao, t.preco]));
-  let criados = 0, pulados = 0, comFoto = 0;
 
+  let criados = 0, pulados = 0, comFoto = 0;
   for (const q of montarQuartos()) {
     if (numerosExistentes.has(q.numero)) { pulados++; continue; }
     const tipoQuartoId = mapaTipos[q.tipo.toLowerCase()];
-    if (!tipoQuartoId) { console.log(`⚠ tipo "${q.tipo}" sem id, pulando quarto ${q.numero}`); continue; }
+    if (!tipoQuartoId) { console.log(`⚠ tipo "${q.tipo}" sem id, pulando ${q.numero}`); continue; }
 
-    // pequena variação de preço por quarto (+/- até R$50)
-    const variacao = Math.round((Math.random() * 100 - 50));
+    const variacao = Math.round(Math.random() * 100 - 50); // +/- R$50
     const preco = Math.max(100, precoPorTipo[q.tipo] + variacao);
 
     try {
       const quarto = await fetchJson(`${BASE}/api/quartos`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ numero: q.numero, preco, status: 1, tipoQuartoId }),
       });
       const quartoId = quarto.id ?? quarto.quarto_id;
@@ -146,24 +127,14 @@ async function main() {
       if (b64) {
         try {
           await fetchJson(`${BASE}/api/quartos/${quartoId}/fotos`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              foto_bin: b64,
-              foto_nome: `quarto-${q.numero}`,
-              foto_extensao: 'jpg',
-              foto_status: 1,
-            }),
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ foto_bin: b64, foto_nome: `quarto-${q.numero}`, foto_extensao: 'jpeg', foto_status: 1 }),
           });
           comFoto++;
-        } catch (e) {
-          console.log(`⚠ quarto ${q.numero} criado, mas falhou a foto: ${e.message}`);
-        }
+        } catch (e) { console.log(`⚠ quarto ${q.numero} sem foto: ${e.message}`); }
       }
-      console.log(`✓ quarto ${q.numero} (${q.tipo}) — R$ ${preco}${b64 ? ' +foto' : ''}`);
-    } catch (e) {
-      console.log(`✗ erro no quarto ${q.numero}: ${e.message}`);
-    }
+      console.log(`✓ ${q.numero} (${q.tipo}) — R$ ${preco}${b64 ? ' +foto' : ''}`);
+    } catch (e) { console.log(`✗ erro no quarto ${q.numero}: ${e.message}`); }
   }
 
   console.log(`\n✅ Concluído: ${criados} criados, ${pulados} já existiam, ${comFoto} com foto.\n`);

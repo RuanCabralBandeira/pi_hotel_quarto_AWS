@@ -5,13 +5,10 @@
 - **Prefixo interno `/api`:** o IIS remove `/20261prj5/hotel/quarto`, então o container recebe `/api/quartos`.
 - **Contexto geral do projeto:** ver `CONTEXTO.md` do front (https://github.com/claracatarin4/frontHotelaria).
 
-## ⚠️ COMMIT PENDENTE (fazer na faculdade — push estava bloqueado por 403)
-Em 2026-06-22 implementei **autenticação/autorização** aqui, mas a conta `RuanCabralBandeira`
-não tem permissão de escrita neste repo (push deu **403**). O commit existe **local** (`76c0ab4`).
-
-**O que fazer amanhã:** com uma conta que tenha acesso de escrita (a `claracatarin4`, ou adicionar
-o Ruan como colaborador), dar `git push`. Se estiver em outra máquina (sem o commit local),
-reproduzir as alterações abaixo e commitar.
+## ✅ Auth já no GitHub (push resolvido)
+Em 2026-06-22 implementei **autenticação/autorização** aqui (commit `76c0ab4`). O push chegou a
+falhar com 403, mas o Ruan virou colaborador e **já está pushado** no `main`. Falta só **deploy no
+Jenkins + `iisreset`** e confirmar `JWT_SECRET=segredo` no env. Detalhes abaixo.
 
 ## Alterações de autenticação (o que mudou)
 **Pré-requisito:** `JWT_SECRET` no env deste serviço = **`segredo`** (igual aos outros 4 MS).

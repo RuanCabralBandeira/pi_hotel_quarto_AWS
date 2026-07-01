@@ -12,4 +12,4 @@ RUN npx prisma generate
 
 EXPOSE 9533
 
-CMD ["sh", "-c", "npx prisma db push && node src/server.js"]
+CMD ["node", "src/server.js"]
